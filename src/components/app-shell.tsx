@@ -16,10 +16,9 @@ import {
   Clock,
 } from "lucide-react";
 import { type ReactNode, useState } from "react";
-import { getCurrentUserRole } from "@/lib/auth/admin-server";
 import { authClient, signOut } from "@/lib/auth/client";
 import { UserButton } from "@/lib/auth/gates";
-import { useCurrentUserState } from "@/lib/auth/use-current-user";
+import { useCurrentUserState, useCurrentUserRole } from "@/lib/auth/use-current-user";
 import { cn } from "@/lib/utils";
 import { Emblem } from "./emblem";
 import { LoginPage } from "./login-page";
@@ -113,12 +112,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [showUsersModal, setShowUsersModal] = useState(false);
 
-  const roleQuery = useQuery({
-    queryKey: ["current-user-role", user?.id],
-    queryFn: () => getCurrentUserRole(),
-    enabled: Boolean(user?.id),
-    staleTime: 1000 * 30,
-  });
+  const roleQuery = useCurrentUserRole();
 
   if (isPending) {
     return (
@@ -134,6 +128,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   if (!user) return <LoginPage />;
 
+  const isRoleLoading = roleQuery.isLoading;
   const isApproved = roleQuery.data?.isApproved ?? true;
   const isAdmin = roleQuery.data?.isAdmin ?? false;
   const pendingCount = roleQuery.data?.pendingApprovalsCount ?? 0;
@@ -188,7 +183,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <p className="truncate text-sm font-semibold text-ink">مجمع مدارس النور للمكفوفين</p>
-              {isAdmin ? (
+              {isRoleLoading ? (
+                <Skeleton className="h-5 w-24 rounded-full" />
+              ) : isAdmin ? (
                 <Badge tone="default" className="gap-1 text-[11px] py-0 px-2">
                   <ShieldCheck className="size-3" />
                   مدير النظام (أدمن)

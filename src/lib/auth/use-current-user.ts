@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import { getCurrentUserRole } from "./admin-server";
 import { authClient, authEnabled } from "./client";
 
 /** Normalized user shape used across the app, auth on or off. */
@@ -80,4 +82,14 @@ export function useCurrentUserState(): CurrentUserState {
  */
 export function useCurrentUser(): AppUser | null {
   return useCurrentUserState().user;
+}
+
+export function useCurrentUserRole() {
+  const { user } = useCurrentUserState();
+  return useQuery({
+    queryKey: ["current-user-role", user?.id],
+    queryFn: () => getCurrentUserRole(),
+    enabled: Boolean(user?.id),
+    staleTime: 1000 * 10,
+  });
 }

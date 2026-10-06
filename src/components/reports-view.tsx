@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import * as XLSX from "xlsx";
-import { getCurrentUserRole } from "@/lib/auth/admin-server";
+import { useCurrentUserRole } from "@/lib/auth/use-current-user";
 import { listAudit, listStaff, restoreOfficialData } from "@/lib/staff-server";
 import { SCHOOLS } from "@/lib/staff-types";
 import { csvEscape, downloadTextFile, formatIsoDate } from "@/lib/utils";
@@ -93,7 +93,7 @@ export function ReportsView() {
   const qc = useQueryClient();
   const staff = useQuery({ queryKey: ["staff"], queryFn: () => listStaff() });
   const audit = useQuery({ queryKey: ["audit"], queryFn: () => listAudit() });
-  const roleQuery = useQuery({ queryKey: ["current-user-role"], queryFn: () => getCurrentUserRole() });
+  const roleQuery = useCurrentUserRole();
   const isAdmin = roleQuery.data?.isAdmin ?? false;
 
   const restore = useMutation({

@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { ShieldAlert, ArrowRight } from "lucide-react";
-import { getCurrentUserRole } from "@/lib/auth/admin-server";
+import { useCurrentUserRole } from "@/lib/auth/use-current-user";
 import { parseEgyptianNid } from "@/lib/national-id";
 import { getStaff, inputFromRow, saveStaff } from "@/lib/staff-server";
 import { CATEGORIES, EDUCATION_GROUP, QUAL_TYPES, SCHOOLS, type StaffInput } from "@/lib/staff-types";
@@ -53,7 +53,7 @@ export function StaffForm({ id }: { id?: number }) {
     queryFn: () => getStaff({ data: { id: id! } }),
     enabled: id != null,
   });
-  const roleQuery = useQuery({ queryKey: ["current-user-role"], queryFn: () => getCurrentUserRole() });
+  const roleQuery = useCurrentUserRole();
   const isAdmin = roleQuery.data?.isAdmin ?? false;
 
   const [form, setForm] = useState<StaffInput>(emptyForm);

@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Plus, ShieldAlert, Trash2 } from "lucide-react";
-import { getCurrentUserRole } from "@/lib/auth/admin-server";
+import { useCurrentUserRole } from "@/lib/auth/use-current-user";
 import { deleteStaff, listStaff } from "@/lib/staff-server";
 import { matchesQuery, searchStaff, type StaffQueryId } from "@/lib/staff-filters";
 import { SCHOOLS } from "@/lib/staff-types";
@@ -23,7 +23,7 @@ export function StaffTable({
   const navigate = useNavigate();
   const qc = useQueryClient();
   const list = useQuery({ queryKey: ["staff"], queryFn: () => listStaff() });
-  const roleQuery = useQuery({ queryKey: ["current-user-role"], queryFn: () => getCurrentUserRole() });
+  const roleQuery = useCurrentUserRole();
   const isAdmin = roleQuery.data?.isAdmin ?? false;
 
   const [term, setTerm] = useState("");

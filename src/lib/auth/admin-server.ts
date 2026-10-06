@@ -53,14 +53,22 @@ export async function checkUserRole(userId: string): Promise<{
 
   const email = (rows[0].email || "").toLowerCase();
   const isAdminEmail =
-    email.startsWith("admin@") ||
-    email.startsWith("admin.") ||
-    email.startsWith("admin_") ||
+    email.startsWith("admin") ||
+    email.includes("admin@") ||
     email === "admin@alnour.suez.edu.eg";
   const isRoleAdmin = rows[0].role === "admin";
   const isAdmin = isAdminEmail || isRoleAdmin;
   const role: "admin" | "viewer" = isAdmin ? "admin" : "viewer";
   const isApproved = isAdmin ? true : Boolean(rows[0].is_approved);
+
+  if (isAdmin && (rows[0].role !== "admin" || !rows[0].is_approved)) {
+    await sql.query(
+      `insert into user_approvals (user_id, role, is_approved, approved_at)
+       values ($1, 'admin', true, now())
+       on conflict (user_id) do update set role = 'admin', is_approved = true, approved_at = coalesce(user_approvals.approved_at, now())`,
+      [userId],
+    );
+  }
 
   return {
     role,
