@@ -1,0 +1,235 @@
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Cairo", "Segoe UI", Tahoma, sans-serif;
+  --font-display: "Cairo", "Segoe UI", Tahoma, sans-serif;
+
+  --color-bg: #efe8d8;
+  --color-bg-elevated: #f7f1e4;
+  --color-surface: #fffdf8;
+  --color-fg: #1c2430;
+  --color-muted: #5b6470;
+  --color-subtle: #7a8490;
+  --color-border: #d9d0be;
+  --color-border-strong: #c4b89f;
+  --color-primary: #1b4d6e;
+  --color-primary-fg: #f7f1e4;
+  --color-primary-soft: #e4eef4;
+  --color-ink: #152033;
+  --color-danger: #9b2c2c;
+  --color-danger-soft: #f8e6e6;
+  --color-success: #276749;
+  --color-success-soft: #e6f3ea;
+  --color-warn: #9c4221;
+  --color-warn-soft: #f6eadc;
+  --color-ring: #1b4d6e;
+
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
+
+  --shadow-card: 0 0 0 1px rgba(28, 36, 48, 0.06), 0 1px 2px rgba(28, 36, 48, 0.05),
+    0 12px 28px -18px rgba(21, 32, 51, 0.28);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    min-height: 100dvh;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+}
+
+.app-watermark {
+  background-image: radial-gradient(circle at 12% 8%, rgba(27, 77, 110, 0.05), transparent 32%),
+    radial-gradient(circle at 88% 0%, rgba(27, 77, 110, 0.04), transparent 28%);
+}
+
+.datasheet {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.datasheet th,
+.datasheet td {
+  border-bottom: 1px solid var(--color-border);
+  border-left: 1px solid var(--color-border);
+}
+
+.datasheet th:last-child,
+.datasheet td:last-child {
+  border-left: 0;
+}
+
+/* PDF export: render the same report as a desktop-width sheet so the full
+   table is included even when the user starts the export from a phone. */
+.pdf-exporting {
+  width: 1080px !important;
+  max-width: 1080px !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+  padding: 12px !important;
+}
+
+.pdf-exporting > div {
+  overflow: visible !important;
+}
+
+.pdf-exporting table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: auto !important;
+  border-collapse: collapse !important;
+}
+
+.pdf-exporting .datasheet th,
+.pdf-exporting .datasheet td {
+  border: 1px solid #333333 !important;
+  color: #000000 !important;
+}
+
+.pdf-exporting .datasheet th {
+  background-color: #eae5d9 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 6mm 6mm 6mm 6mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: "Cairo", "Segoe UI", Tahoma, sans-serif !important;
+    min-height: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .app-watermark {
+    background: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+
+  .no-print,
+  header,
+  aside,
+  nav {
+    display: none !important;
+  }
+
+  .print-sheet {
+    width: 100% !important;
+    max-width: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+  }
+
+  .print-sheet > div {
+    overflow: visible !important;
+  }
+
+  .datasheet {
+    width: 100% !important;
+    min-width: 0 !important;
+    border-collapse: collapse !important;
+    table-layout: auto !important;
+    font-size: 10px !important;
+    line-height: 1.25 !important;
+  }
+
+  .datasheet thead {
+    display: table-header-group !important;
+    background-color: #f0ede6 !important;
+    color: #000000 !important;
+  }
+
+  .datasheet tbody tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .datasheet th,
+  .datasheet td {
+    border: 1px solid #333333 !important;
+    padding: 3px 4px !important;
+    color: #000000 !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .datasheet th {
+    font-weight: 700 !important;
+    background-color: #eae5d9 !important;
+  }
+
+  .text-muted,
+  .text-subtle {
+    color: #333333 !important;
+  }
+
+  footer {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    margin-top: 15px !important;
+  }
+}
