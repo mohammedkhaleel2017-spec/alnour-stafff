@@ -219,7 +219,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-[1400px] lg:grid-cols-[240px_1fr]">
+      <div className="print-layout mx-auto grid max-w-[1400px] lg:grid-cols-[240px_1fr]">
         <aside className="no-print hidden border-l border-border p-4 lg:block">
           <p className="mb-3 px-3 text-xs font-medium tracking-wide text-subtle">وحدات النظام</p>
           <NavLinks
