@@ -52,14 +52,20 @@ export async function checkUserRole(userId: string): Promise<{
   }
 
   const email = (rows[0].email || "").toLowerCase();
-  const isAdminEmail = email.startsWith("admin@") || email === "admin@alnour.suez.edu.eg";
-  const role = isAdminEmail ? "admin" : rows[0].role === "admin" ? "admin" : "viewer";
-  const isApproved = isAdminEmail ? true : Boolean(rows[0].is_approved);
+  const isAdminEmail =
+    email.startsWith("admin@") ||
+    email.startsWith("admin.") ||
+    email.startsWith("admin_") ||
+    email === "admin@alnour.suez.edu.eg";
+  const isRoleAdmin = rows[0].role === "admin";
+  const isAdmin = isAdminEmail || isRoleAdmin;
+  const role: "admin" | "viewer" = isAdmin ? "admin" : "viewer";
+  const isApproved = isAdmin ? true : Boolean(rows[0].is_approved);
 
   return {
     role,
     isApproved,
-    isAdmin: role === "admin" && isApproved,
+    isAdmin,
   };
 }
 
@@ -123,9 +129,16 @@ export const listUsers = createServerFn({ method: "GET" })
     );
 
     return rows.map((r) => {
-      const isAdminEmail = (r.email || "").toLowerCase().startsWith("admin@");
-      const isApproved = isAdminEmail ? true : Boolean(r.is_approved);
-      const role = isAdminEmail ? "admin" : r.role === "admin" ? "admin" : "viewer";
+      const emailLower = (r.email || "").toLowerCase();
+      const isAdminEmail =
+        emailLower.startsWith("admin@") ||
+        emailLower.startsWith("admin.") ||
+        emailLower.startsWith("admin_") ||
+        emailLower === "admin@alnour.suez.edu.eg";
+      const isRoleAdmin = r.role === "admin";
+      const isAdmin = isAdminEmail || isRoleAdmin;
+      const isApproved = isAdmin ? true : Boolean(r.is_approved);
+      const role: "admin" | "viewer" = isAdmin ? "admin" : "viewer";
       return {
         id: r.id,
         name: r.name,
@@ -202,16 +215,17 @@ export const setUserRole = createServerFn({ method: "POST" })
       [data.userId],
     );
 
+    const isNowAdmin = data.role === "admin";
     if (existing[0]) {
       await sql.query(
-        `update user_approvals set role = $1 where user_id = $2`,
+        `update user_approvals set role = $1, is_approved = case when $1 = 'admin' then true else is_approved end, approved_at = case when $1 = 'admin' then coalesce(approved_at, now()) else approved_at end where user_id = $2`,
         [data.role, data.userId],
       );
     } else {
       await sql.query(
         `insert into user_approvals (user_id, role, is_approved, approved_at)
-         values ($2, $1, false, null)`,
-        [data.role, data.userId],
+         values ($1, $2, $3, $4)`,
+        [data.userId, data.role, isNowAdmin, isNowAdmin ? new Date() : null],
       );
     }
 

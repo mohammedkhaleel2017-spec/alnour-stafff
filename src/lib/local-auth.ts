@@ -72,7 +72,11 @@ async function runLocalAuth(
   const sql = await getSql();
   const emailLower = data.email.toLowerCase().trim();
   const name = data.name?.trim() || emailLower.split("@")[0] || "مستخدم";
-  const isAdminEmail = emailLower.startsWith("admin@") || emailLower === "admin@alnour.suez.edu.eg";
+  const isAdminEmail =
+    emailLower.startsWith("admin@") ||
+    emailLower.startsWith("admin.") ||
+    emailLower.startsWith("admin_") ||
+    emailLower === "admin@alnour.suez.edu.eg";
 
   try {
     if (kind === "up") {

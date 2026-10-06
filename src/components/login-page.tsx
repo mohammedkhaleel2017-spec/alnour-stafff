@@ -14,6 +14,7 @@ function storeSessionToken(token: string | null) {
   if (!token || typeof window === "undefined") return;
   try {
     window.sessionStorage.setItem(BEARER_KEY, token);
+    window.localStorage.setItem(BEARER_KEY, token);
   } catch {
     /* ignore */
   }
