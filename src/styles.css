@@ -91,39 +91,6 @@
   border-left: 0;
 }
 
-/* PDF export: render the same report as a desktop-width sheet so the full
-   table is included even when the user starts the export from a phone. */
-.pdf-exporting {
-  width: 1080px !important;
-  max-width: 1080px !important;
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  overflow: visible !important;
-  box-sizing: border-box !important;
-  padding: 12px !important;
-}
-
-.pdf-exporting > div {
-  overflow: visible !important;
-}
-
-.pdf-exporting table {
-  width: 100% !important;
-  min-width: 0 !important;
-  table-layout: auto !important;
-  border-collapse: collapse !important;
-}
-
-.pdf-exporting .datasheet th,
-.pdf-exporting .datasheet td {
-  border: 1px solid #333333 !important;
-  color: #000000 !important;
-}
-
-.pdf-exporting .datasheet th {
-  background-color: #eae5d9 !important;
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

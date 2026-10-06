@@ -129,9 +129,22 @@ export function AppShell({ children }: { children: ReactNode }) {
   if (!user) return <LoginPage />;
 
   const isRoleLoading = roleQuery.isLoading;
-  const isApproved = roleQuery.data?.isApproved ?? true;
+  const isApproved = roleQuery.data?.isApproved ?? false;
   const isAdmin = roleQuery.data?.isAdmin ?? false;
   const pendingCount = roleQuery.data?.pendingApprovalsCount ?? 0;
+
+  // Still fetching role — keep showing skeleton so we don't flash wrong content
+  if (isRoleLoading) {
+    return (
+      <div className="min-h-dvh bg-bg p-6">
+        <div className="mx-auto grid max-w-6xl gap-4">
+          <p className="text-sm text-muted">جارٍ التحقق من الصلاحيات…</p>
+          <Skeleton className="h-16 w-full rounded-xl" />
+          <Skeleton className="h-80 w-full rounded-xl" />
+        </div>
+      </div>
+    );
+  }
 
   // If logged-in user is not yet approved by admin:
   if (roleQuery.data && !isApproved) {
