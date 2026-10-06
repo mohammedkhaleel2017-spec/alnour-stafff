@@ -162,7 +162,7 @@ export const OFFICIAL_STAFF: StaffSeed[] = [
     cadreJob: "غير مخاطب حاليا بقانون كادر المعلم",
     cadreDate: "",
     schoolCode: "primary",
-    category: "مشرف نشاط",
+    category: "غير مخاطب بقانون الخدمة المدنية",
     underCadre: false,
   },
   {
@@ -180,7 +180,7 @@ export const OFFICIAL_STAFF: StaffSeed[] = [
     cadreJob: "غير مخاطب حاليا بقانون كادر المعلم",
     cadreDate: "",
     schoolCode: "primary",
-    category: "مشرف نشاط",
+    category: "غير مخاطب بقانون الخدمة المدنية",
     underCadre: false,
   },
   {
@@ -216,7 +216,7 @@ export const OFFICIAL_STAFF: StaffSeed[] = [
     cadreJob: "غير مخاطب حاليا بقانون كادر المعلم",
     cadreDate: "",
     schoolCode: "primary",
-    category: "فني صيانة",
+    category: "غير مخاطب بقانون الخدمة المدنية",
     underCadre: false,
   },
   {
@@ -288,7 +288,7 @@ export const OFFICIAL_STAFF: StaffSeed[] = [
     cadreJob: "غير مخاطب حاليا بقانون كادر المعلم",
     cadreDate: "",
     schoolCode: "primary",
-    category: "مشرف نشاط",
+    category: "غير مخاطب بقانون الخدمة المدنية",
     underCadre: false,
   },
   {
@@ -432,7 +432,7 @@ export const OFFICIAL_STAFF: StaffSeed[] = [
     cadreJob: "غير مخاطب حاليا بقانون كادر المعلم",
     cadreDate: "",
     schoolCode: "prep",
-    category: "إداري",
+    category: "غير مخاطب بقانون الخدمة المدنية",
     underCadre: false,
   },
   {
@@ -576,7 +576,7 @@ export const OFFICIAL_STAFF: StaffSeed[] = [
     cadreJob: "غير مخاطب حاليا بقانون كادر المعلم",
     cadreDate: "2025-02-03",
     schoolCode: "secondary",
-    category: "فني معامل",
+    category: "غير مخاطب بقانون الخدمة المدنية",
     underCadre: false,
   },
   {
@@ -630,7 +630,7 @@ export const OFFICIAL_STAFF: StaffSeed[] = [
     cadreJob: "أمين مكتبة خبير",
     cadreDate: "2025-02-03",
     schoolCode: "secondary",
-    category: "أمين مكتبة",
+    category: "أخصائي مكتبات",
     underCadre: true,
   },
   {

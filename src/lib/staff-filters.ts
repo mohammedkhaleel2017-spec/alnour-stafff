@@ -53,7 +53,14 @@ export function matchesQuery(row: StaffRow, query: StaffQueryId | undefined): bo
   }
   if (query === "pedagogy") return row.qualification.includes("التأهيل التربوي");
   if (query === "specialists") {
-    return ["أخصائي اجتماعي", "أخصائي صحافة وإعلام", "أمين مكتبة", "وكيل مدرسة"].includes(row.category);
+    return [
+      "أخصائي اجتماعي",
+      "أخصائي صحافة وإعلام",
+      "أخصائي نفسي",
+      "أخصائي مكتبات",
+      "وكيل مدرسة",
+      "مدير مدرسة",
+    ].includes(row.category);
   }
   return true;
 }
