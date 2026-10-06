@@ -45,3 +45,22 @@ export function csvEscape(value: unknown): string {
   if (/[",\n\r]/.test(text)) return `"${text.replace(/"/g, '""')}"`;
   return text;
 }
+
+export function downloadAuditCsv(items: Array<{ id: number; action: string; summary: string; created_at: string; staff_id: number | null }>) {
+  const headers = ["معرف العملية", "نوع الإجراء", "التاريخ والوقت", "التفاصيل", "رقم المعلم"];
+  const rows = items.map((a) =>
+    [
+      a.id,
+      a.action === "create" ? "إضافة" : a.action === "update" ? "تعديل" : a.action === "delete" ? "حذف" : a.action,
+      formatIsoDate(a.created_at),
+      a.summary,
+      a.staff_id ?? "—",
+    ]
+      .map(csvEscape)
+      .join(","),
+  );
+
+  const csvContent = "\uFEFF" + [headers.map(csvEscape).join(","), ...rows].join("\n");
+  downloadTextFile(`سجل-تعديلات-وحذف-العاملين-${new Date().toISOString().slice(0, 10)}.csv`, csvContent, "text/csv;charset=utf-8");
+}
+

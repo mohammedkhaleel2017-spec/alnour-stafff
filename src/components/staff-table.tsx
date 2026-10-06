@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Plus, ShieldAlert, Trash2 } from "lucide-react";
+import { Download, History, Plus, ShieldAlert, Trash2, X } from "lucide-react";
 import { useCurrentUserRole } from "@/lib/auth/use-current-user";
-import { deleteStaff, listStaff } from "@/lib/staff-server";
+import { deleteStaff, listAudit, listStaff } from "@/lib/staff-server";
 import { matchesQuery, searchStaff, type StaffQueryId } from "@/lib/staff-filters";
 import { SCHOOLS } from "@/lib/staff-types";
-import { formatIsoDate } from "@/lib/utils";
+import { downloadAuditCsv, formatIsoDate } from "@/lib/utils";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -23,12 +23,15 @@ export function StaffTable({
   const navigate = useNavigate();
   const qc = useQueryClient();
   const list = useQuery({ queryKey: ["staff"], queryFn: () => listStaff() });
+  const audit = useQuery({ queryKey: ["audit"], queryFn: () => listAudit() });
   const roleQuery = useCurrentUserRole();
   const isAdmin = roleQuery.data?.isAdmin ?? false;
 
   const [term, setTerm] = useState("");
   const [school, setSchool] = useState(initialSchool ?? "");
   const [query, setQuery] = useState<StaffQueryId>(initialQuery ?? "all");
+  const [showAuditModal, setShowAuditModal] = useState(false);
+  const [statusNotice, setStatusNotice] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialQuery) setQuery(initialQuery);
@@ -39,6 +42,7 @@ export function StaffTable({
     mutationFn: (id: number) => deleteStaff({ data: { id } }),
     onSuccess: async () => {
       await qc.invalidateQueries();
+      setStatusNotice("تم حذف المعلم بنجاح وتسجيل العملية في السجل.");
     },
   });
 
@@ -66,13 +70,58 @@ export function StaffTable({
           </div>
           <p className="text-sm text-muted">عرض شبكة بأعمدة كشوف المراجعة · {rows.length} سجل</p>
         </div>
-        {isAdmin ? (
-          <Button onClick={() => navigate({ to: "/staff/new" })} className="gap-1.5">
-            <Plus className="size-4" />
-            إضافة معلم
+        <div className="flex flex-wrap items-center gap-2">
+          {audit.data && audit.data.length > 0 ? (
+            <Button
+              variant="outline"
+              onClick={() => downloadAuditCsv(audit.data)}
+              className="gap-1.5 text-xs"
+            >
+              <Download className="size-4" />
+              حفظ السجل (CSV)
+            </Button>
+          ) : null}
+          <Button
+            variant="outline"
+            onClick={() => setShowAuditModal(true)}
+            className="gap-1.5 text-xs"
+          >
+            <History className="size-4" />
+            سجل العمليات ({audit.data?.length ?? 0})
           </Button>
-        ) : null}
+          {isAdmin ? (
+            <Button onClick={() => navigate({ to: "/staff/new" })} className="gap-1.5">
+              <Plus className="size-4" />
+              إضافة معلم
+            </Button>
+          ) : null}
+        </div>
       </div>
+
+      {statusNotice ? (
+        <div className="flex items-center justify-between rounded-xl bg-success-soft p-3.5 text-sm text-success">
+          <span>{statusNotice}</span>
+          <div className="flex items-center gap-2">
+            {audit.data ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => downloadAuditCsv(audit.data)}
+                className="h-7 text-xs bg-white"
+              >
+                تنزيل السجل الآن
+              </Button>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => setStatusNotice(null)}
+              className="text-muted hover:text-ink"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       <div className="grid gap-3 rounded-xl bg-surface p-4 shadow-[var(--shadow-card)] md:grid-cols-3">
         <Input
@@ -174,6 +223,70 @@ export function StaffTable({
           </tbody>
         </table>
       </div>
+
+      {/* Audit Log Modal */}
+      {showAuditModal ? (
+        <div className="no-print fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            className="absolute inset-0 bg-ink/50 backdrop-blur-xs"
+            aria-label="إغلاق"
+            onClick={() => setShowAuditModal(false)}
+          />
+          <div className="relative z-10 max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-surface p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div className="flex items-center gap-2">
+                <History className="size-5 text-primary" />
+                <h3 className="text-lg font-bold">سجل التعديلات والعمليات</h3>
+              </div>
+              <div className="flex items-center gap-2">
+                {audit.data && audit.data.length > 0 ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => downloadAuditCsv(audit.data)}
+                    className="gap-1.5 text-xs"
+                  >
+                    <Download className="size-3.5" />
+                    تنزيل / حفظ السجل
+                  </Button>
+                ) : null}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowAuditModal(false)}
+                  aria-label="إغلاق"
+                >
+                  <X className="size-5" />
+                </Button>
+              </div>
+            </div>
+
+            {audit.isLoading ? (
+              <p className="text-sm text-muted">جارٍ تحميل السجل…</p>
+            ) : audit.error ? (
+              <p className="text-sm text-danger">تعذر تحميل سجل العمليات.</p>
+            ) : (
+              <ul className="max-h-96 space-y-2 overflow-y-auto text-sm">
+                {(audit.data ?? []).map((a) => (
+                  <li key={a.id} className="rounded-lg bg-bg-elevated p-3 border border-border/50">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-semibold text-ink">
+                        {a.action === "create" ? "🟢 إضافة معلم" : a.action === "update" ? "🔵 تعديل بيانات" : a.action === "delete" ? "🔴 حذف معلم" : a.action}
+                      </span>
+                      <span className="text-xs text-subtle tabular-nums">{formatIsoDate(a.created_at)}</span>
+                    </div>
+                    <p className="mt-1 text-xs text-muted leading-relaxed">{a.summary}</p>
+                  </li>
+                ))}
+                {!audit.data?.length ? (
+                  <li className="p-4 text-center text-muted">لا توجد عمليات مسجلة حتى الآن.</li>
+                ) : null}
+              </ul>
+            )}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

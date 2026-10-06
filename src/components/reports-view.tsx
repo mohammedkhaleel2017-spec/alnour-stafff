@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import * as XLSX from "xlsx";
+import { Download, FileSpreadsheet, History, RotateCcw } from "lucide-react";
 import { useCurrentUserRole } from "@/lib/auth/use-current-user";
 import { listAudit, listStaff, restoreOfficialData } from "@/lib/staff-server";
 import { SCHOOLS } from "@/lib/staff-types";
-import { csvEscape, downloadTextFile, formatIsoDate } from "@/lib/utils";
+import { csvEscape, downloadAuditCsv, downloadTextFile, formatIsoDate } from "@/lib/utils";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { MinistryImport } from "./ministry-import";
@@ -187,8 +188,23 @@ export function ReportsView() {
       ) : null}
 
       <Card className="space-y-3">
-        <CardTitle>سجل العمليات</CardTitle>
-        <CardHint>آخر عمليات الاستيراد والحفظ والاستعادة المسجلة في النظام.</CardHint>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <CardTitle>سجل العمليات والتغيرات</CardTitle>
+            <CardHint>آخر عمليات التعديل والحذف والإضافة والاستعادة المسجلة في النظام.</CardHint>
+          </div>
+          {audit.data && audit.data.length > 0 ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => downloadAuditCsv(audit.data)}
+              className="gap-2 text-xs"
+            >
+              <Download className="size-3.5" />
+              تنزيل / حفظ السجل (CSV)
+            </Button>
+          ) : null}
+        </div>
         {audit.isLoading ? (
           <p className="text-sm text-muted">جارٍ التحميل…</p>
         ) : audit.error ? (
@@ -197,10 +213,11 @@ export function ReportsView() {
           <ul className="max-h-64 space-y-2 overflow-y-auto text-sm">
             {(audit.data ?? []).map((a) => (
               <li key={a.id} className="rounded-md bg-bg-elevated p-2">
-                <span className="font-medium">{a.action}</span>
-                {" · "}
-                <span className="text-muted">{formatIsoDate(a.created_at)}</span>
-                <div className="text-muted">{a.summary}</div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium">{a.action === "create" ? "إضافة" : a.action === "update" ? "تعديل" : a.action === "delete" ? "حذف" : a.action}</span>
+                  <span className="text-xs text-muted">{formatIsoDate(a.created_at)}</span>
+                </div>
+                <div className="text-xs text-muted mt-1">{a.summary}</div>
               </li>
             ))}
             {!audit.data?.length ? (
